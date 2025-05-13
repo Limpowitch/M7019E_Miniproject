@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">SpotifySongListApp</string>
+    <string name="song_list">Song list</string>
+    <string name="song_information">PLACEHOLDER, SHOULD HAVE SONG NAME</string>
 </resources>
