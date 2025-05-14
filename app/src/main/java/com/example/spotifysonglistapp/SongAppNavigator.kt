@@ -32,6 +32,9 @@ import com.example.spotifysonglistapp.ui.SongList
 import com.example.spotifysonglistapp.ui.Welcome
 import com.example.spotifysonglistapp.viewmodel.SongViewModel
 import com.example.spotifysonglistapp.auth.TokenManager
+import com.example.spotifysonglistapp.network.SpotifyApiService
+import com.example.spotifysonglistapp.repository.SpotifyRepository
+import com.example.spotifysonglistapp.viewmodel.SongViewModelFactory
 
 
 enum class SongAppScreen(@StringRes val title: Int) {
@@ -82,13 +85,17 @@ fun SongAppNavigator(
 
     val context = LocalContext.current
     val application = context.applicationContext as Application
-    val songViewModel: SongViewModel = viewModel(
-        factory = ViewModelProvider.AndroidViewModelFactory.getInstance(application)
-    )
+    val token = TokenManager(context).getToken()
+    val tokenManager = TokenManager(context)
+    val apiService = SpotifyApiService.create { tokenManager.getToken() ?: "" }
+    val repository = SpotifyRepository(context, SpotifyApiService.create { tokenManager.getToken() ?: "" }, tokenManager::getToken)
+
+
+
 
 
     // ✅ Determine start destination based on token
-    val token = TokenManager(context).getToken()
+
     LaunchedEffect(Unit) {
         if (token != null) {
             navController.navigate(SongAppScreen.SongList.name) {
@@ -106,6 +113,12 @@ fun SongAppNavigator(
     } else {
         SongAppScreen.Welcome.name
     }
+
+    val songViewModel: SongViewModel = viewModel(
+        factory = SongViewModelFactory(context)
+    )
+
+
 
     Scaffold(
         topBar = {

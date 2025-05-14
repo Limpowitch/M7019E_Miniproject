@@ -42,6 +42,17 @@ fun Welcome(navController: NavHostController) {
         tokenManager.saveCodeVerifier(codeVerifier)
     }
 
+    val token = tokenManager.getToken()
+
+    LaunchedEffect(token) {
+        if (token != null) {
+            Log.d("Welcome", "Detected saved token. Navigating to SongList.")
+            navController.navigate(SongAppScreen.SongList.name) {
+                popUpTo(SongAppScreen.Welcome.name) { inclusive = true }
+            }
+        }
+    }
+
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -69,23 +80,25 @@ fun Welcome(navController: NavHostController) {
     ) {
         Text("Welcome to Spotify Stats!", style = MaterialTheme.typography.headlineMedium)
         Spacer(modifier = Modifier.height(24.dp))
-        Button(onClick = {
-            val authUri = Uri.Builder()
-                .scheme("https")
-                .authority("accounts.spotify.com")
-                .appendPath("authorize")
-                .appendQueryParameter("client_id", SpotifySecrets.CLIENT_ID)
-                .appendQueryParameter("response_type", "code")
-                .appendQueryParameter("redirect_uri", SpotifySecrets.REDIRECT_URI)
-                .appendQueryParameter("code_challenge_method", "S256")
-                .appendQueryParameter("code_challenge", codeChallenge)
-                .appendQueryParameter("scope", "user-read-recently-played user-top-read")
-                .build()
+        if (token != null) {
+            Button(onClick = {
+                val authUri = Uri.Builder()
+                    .scheme("https")
+                    .authority("accounts.spotify.com")
+                    .appendPath("authorize")
+                    .appendQueryParameter("client_id", SpotifySecrets.CLIENT_ID)
+                    .appendQueryParameter("response_type", "code")
+                    .appendQueryParameter("redirect_uri", SpotifySecrets.REDIRECT_URI)
+                    .appendQueryParameter("code_challenge_method", "S256")
+                    .appendQueryParameter("code_challenge", codeChallenge)
+                    .appendQueryParameter("scope", "user-read-recently-played user-top-read")
+                    .build()
 
-            val intent = Intent(Intent.ACTION_VIEW, authUri)
-            context.startActivity(intent)
-        }) {
-            Text("Login with Spotify")
+                val intent = Intent(Intent.ACTION_VIEW, authUri)
+                context.startActivity(intent)
+            }) {
+                Text("Login with Spotify")
+            }
         }
     }
 }
