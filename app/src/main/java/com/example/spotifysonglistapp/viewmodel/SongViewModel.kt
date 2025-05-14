@@ -26,10 +26,17 @@ class SongViewModel(
 
             val sampleSong = Song( // Just for testing
                 id = 0,
-                title = "Test Song",
+                title = "Test Song 1",
                 posterPath = ""
             )
-            _songList.value = listOf(sampleSong) // we have this here until API is fixed
+
+            val sampleSong2 = Song( // Just for testing
+                id = 1,
+                title = "Test Song 2",
+                posterPath = ""
+            )
+
+            _songList.value = listOf(sampleSong, sampleSong2) // we have this here until API is fixed
         }
     }
 

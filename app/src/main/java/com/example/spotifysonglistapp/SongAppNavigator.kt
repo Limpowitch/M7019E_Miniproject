@@ -28,6 +28,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.spotifysonglistapp.ui.SongInformation
 import com.example.spotifysonglistapp.ui.SongList
 import com.example.spotifysonglistapp.ui.Welcome
+import com.example.spotifysonglistapp.ui.theme.SpotifyBlack
+import com.example.spotifysonglistapp.ui.theme.SpotifyWhite
 import com.example.spotifysonglistapp.viewmodel.SongViewModel
 
 
@@ -50,8 +52,9 @@ fun SongAppBar(
         title = { Text(text = customTitle ?: stringResource(id = currentScreen.title)) }, // We currently dont have custom titles
         modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary
+            containerColor       = SpotifyBlack,
+            titleContentColor    = SpotifyWhite,
+            actionIconContentColor = SpotifyWhite
         ),
         navigationIcon = {
             if (canNavigateBack) {
@@ -59,7 +62,7 @@ fun SongAppBar(
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
                         contentDescription = stringResource(id = R.string.back_button),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        tint = MaterialTheme.colorScheme.primaryContainer
                     )
                 }
             }
