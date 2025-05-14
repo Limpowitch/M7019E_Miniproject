@@ -1,5 +1,6 @@
 package com.example.spotifysonglistapp.ui
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.AsyncImage
 
+import androidx.compose.material3.Button
+import androidx.compose.material3.Text
+import androidx.compose.runtime.remember
+import com.example.spotifysonglistapp.auth.TokenManager
+import androidx.compose.ui.platform.LocalContext
+
 
 
 @Composable
@@ -40,10 +47,21 @@ fun SongList(navController: NavHostController, songViewModel: SongViewModel) {
 
     val songs by songViewModel.songList.collectAsState(initial = emptyList())
 
+
+
     LaunchedEffect(Unit) {
         songViewModel.fetchTopTracks()
     }
 
+    val shouldRedirect by songViewModel.shouldRedirectToLogin.collectAsState()
+
+    LaunchedEffect(shouldRedirect) {
+        if (shouldRedirect) {
+            navController.navigate(SongAppScreen.Welcome.name) {
+                popUpTo(SongAppScreen.SongList.name) { inclusive = true }
+            }
+        }
+    }
 
     LazyColumn {
         items(songs) { song ->
@@ -55,6 +73,19 @@ fun SongList(navController: NavHostController, songViewModel: SongViewModel) {
             )
         }
     }
+
+    // testing
+//    val context = LocalContext.current
+//    val tokenManager = remember { TokenManager(context) }
+//
+//    Button(onClick = {
+//        tokenManager.saveToken("invalid_or_expired_token")
+//        Log.d("WelcomeScreen", "Fake expired token set.")
+//    }) {
+//        Text("Simulate Expired Token")
+//    }
+    // testing
+
 }
 
 @Composable
@@ -80,27 +111,16 @@ fun SongItemCard(
                 horizontalArrangement = Arrangement.spacedBy(16.dp)
             ) {
 
-                // The below is just a placeholder AsyncImage
                 AsyncImage(
-                    model = "https://via.placeholder.com/300x180.png?text=Cover+Art",
-                    contentDescription = "Album art placeholder for ${song.title}",
+                    model = song.albumArtUrl,
+                    contentDescription = "Album art for ${song.title}",
                     placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
-                    error       = painterResource(id = android.R.drawable.ic_menu_report_image),
+                    error = painterResource(id = android.R.drawable.ic_menu_report_image),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .width(80.dp)
                         .height(80.dp)
                 )
-
-                // When API is fixed, uncomment and use AsyncImage below
-//                AsyncImage(
-//                    model = posterUrl,
-//                    contentDescription = song?.title,
-//                    contentScale = ContentScale.Crop,
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .height(180.dp)
-//                )
 
                 Box(
                     modifier = Modifier

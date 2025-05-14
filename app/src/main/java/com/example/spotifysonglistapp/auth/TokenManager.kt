@@ -3,6 +3,7 @@ package com.example.spotifysonglistapp.auth
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import android.util.Log
 
 class TokenManager(context: Context) {
     private val prefs = EncryptedSharedPreferences.create(
@@ -22,7 +23,11 @@ class TokenManager(context: Context) {
         prefs.edit().putString(TOKEN_KEY, token).apply()
     }
 
-    fun getToken(): String? = prefs.getString(TOKEN_KEY, null)
+    fun getToken(): String? {
+        val token = prefs.getString(TOKEN_KEY, null)
+        Log.d("TokenManager", "getToken called, value: $token")
+        return token
+    }
 
     fun clearToken() {
         prefs.edit().remove(TOKEN_KEY).apply()

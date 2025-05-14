@@ -44,21 +44,12 @@ fun Welcome(navController: NavHostController) {
 
     val token = tokenManager.getToken()
 
-    LaunchedEffect(token) {
-        if (token != null) {
-            Log.d("Welcome", "Detected saved token. Navigating to SongList.")
-            navController.navigate(SongAppScreen.SongList.name) {
-                popUpTo(SongAppScreen.Welcome.name) { inclusive = true }
-            }
-        }
-    }
-
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             val token = result.data?.getStringExtra("access_token")
+            Log.d("WelcomeScreen", "AuthActivity returned, token: $token")
             if (token != null) {
                 tokenManager.saveToken(token)
                 Log.d("Welcome", "Token saved successfully, navigating to SongList")
@@ -78,9 +69,11 @@ fun Welcome(navController: NavHostController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Welcome to Spotify Stats!", style = MaterialTheme.typography.headlineMedium)
+
+
         Spacer(modifier = Modifier.height(24.dp))
-        if (token != null) {
+        if (token == null) {
+            Log.d("WelcomeButton", "Access token is: $token")
             Button(onClick = {
                 val authUri = Uri.Builder()
                     .scheme("https")
@@ -96,9 +89,13 @@ fun Welcome(navController: NavHostController) {
 
                 val intent = Intent(Intent.ACTION_VIEW, authUri)
                 context.startActivity(intent)
+
             }) {
                 Text("Login with Spotify")
             }
+        } else{
+            Text("Welcome to Spotify Stats!", style = MaterialTheme.typography.headlineMedium)
+            Log.d("WelcomeScreen","Access token is empty: $token")
         }
     }
 }

@@ -96,23 +96,19 @@ fun SongAppNavigator(
 
     // ✅ Determine start destination based on token
 
-    LaunchedEffect(Unit) {
-        if (token != null) {
-            navController.navigate(SongAppScreen.SongList.name) {
-                popUpTo(SongAppScreen.Welcome.name) { inclusive = true }
-            }
-        }
-    }
     LaunchedEffect(token) {
         if (token != null) {
             Log.d("SongAppNavigator", "Found saved access token on launch")
         }
     }
     val startDestination = if (token != null) {
+        Log.d("Navigator", "Token found. Starting at SongListScreen")
         SongAppScreen.SongList.name
     } else {
+        Log.d("Navigator", "No token found. Starting at WelcomeScreen")
         SongAppScreen.Welcome.name
     }
+
 
     val songViewModel: SongViewModel = viewModel(
         factory = SongViewModelFactory(context)

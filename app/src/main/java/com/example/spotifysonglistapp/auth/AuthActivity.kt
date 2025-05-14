@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import com.example.spotifysonglistapp.MainActivity
 import com.example.spotifysonglistapp.util.SpotifySecrets
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,34 +45,31 @@ class AuthActivity : Activity() {
                                 tokenManager.saveToken(token)
                                 tokenManager.clearCodeVerifier()
 
-                                val resultIntent = Intent().apply {
-                                    putExtra("access_token", token)
+                                Log.d("AuthActivity", "Token saved — restarting MainActivity")
+
+                                val mainIntent = Intent(this@AuthActivity, MainActivity::class.java).apply {
+                                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                                 }
-                                setResult(RESULT_OK, resultIntent)
+                                startActivity(mainIntent)
                             } else {
                                 Log.e("AuthActivity", "Token response body was null or malformed")
-                                setResult(RESULT_CANCELED)
                             }
                         } else {
                             val error = response.errorBody()?.string()
                             Log.e("AuthActivity", "Token exchange failed: $error")
-                            setResult(RESULT_CANCELED)
                         }
                     } catch (e: Exception) {
                         Log.e("AuthActivity", "Exception during token exchange", e)
-                        setResult(RESULT_CANCELED)
                     }
 
-                    finish()
+                    finish() // Close AuthActivity regardless of result
                 }
             } else {
                 Log.e("AuthActivity", "No authorization code found")
-                setResult(RESULT_CANCELED)
                 finish()
             }
         } else {
             Log.e("AuthActivity", "Unexpected redirect URI: $data")
-            setResult(RESULT_CANCELED)
             finish()
         }
     }

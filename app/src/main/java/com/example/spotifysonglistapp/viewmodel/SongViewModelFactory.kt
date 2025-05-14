@@ -17,7 +17,7 @@ class SongViewModelFactory(private val context: Context) : ViewModelProvider.Fac
         val repository = SpotifyRepository(context, apiService, tokenProvider)
 
         @Suppress("UNCHECKED_CAST")
-        return SongViewModel(repository) as T
+        return SongViewModel(repository, tokenManager) as T
     }
 }
 
