@@ -1,6 +1,7 @@
 package com.example.spotifysonglistapp
 
 import android.app.Application
+import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -22,6 +23,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -29,6 +31,7 @@ import com.example.spotifysonglistapp.ui.SongInformation
 import com.example.spotifysonglistapp.ui.SongList
 import com.example.spotifysonglistapp.ui.Welcome
 import com.example.spotifysonglistapp.viewmodel.SongViewModel
+import com.example.spotifysonglistapp.auth.TokenManager
 
 
 enum class SongAppScreen(@StringRes val title: Int) {
@@ -77,14 +80,32 @@ fun SongAppNavigator(
     val currentScreenName = route.substringBefore("/")
     val currentScreen = SongAppScreen.valueOf(currentScreenName)
 
-
     val context = LocalContext.current
     val application = context.applicationContext as Application
     val songViewModel: SongViewModel = viewModel(
         factory = ViewModelProvider.AndroidViewModelFactory.getInstance(application)
     )
 
-    //TODO: Implement customTitle so we can display Songname in SongInfoScreen
+
+    // ✅ Determine start destination based on token
+    val token = TokenManager(context).getToken()
+    LaunchedEffect(Unit) {
+        if (token != null) {
+            navController.navigate(SongAppScreen.SongList.name) {
+                popUpTo(SongAppScreen.Welcome.name) { inclusive = true }
+            }
+        }
+    }
+    LaunchedEffect(token) {
+        if (token != null) {
+            Log.d("SongAppNavigator", "Found saved access token on launch")
+        }
+    }
+    val startDestination = if (token != null) {
+        SongAppScreen.SongList.name
+    } else {
+        SongAppScreen.Welcome.name
+    }
 
     Scaffold(
         topBar = {
@@ -92,14 +113,12 @@ fun SongAppNavigator(
                 currentScreen = currentScreen,
                 canNavigateBack = currentScreen != SongAppScreen.Welcome,
                 navigateUp = { navController.navigateUp() },
-                //custom title is commented out until API @GET call is implemented
-                //customTitle = customTitle
             )
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = SongAppScreen.Welcome.name,
+            startDestination = startDestination,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable(route = SongAppScreen.Welcome.name) {
@@ -116,3 +135,4 @@ fun SongAppNavigator(
         }
     }
 }
+

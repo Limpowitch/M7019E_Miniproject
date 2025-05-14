@@ -16,7 +16,11 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders["redirectSchemeName"] = "spotifystats"
+        manifestPlaceholders["redirectHostName"] = "callback"
     }
+
 
     buildTypes {
         release {
@@ -58,4 +62,12 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
+    implementation(libs.auth)                       //spotify OAuth
+    implementation(libs.androidx.security.crypto)   //encryption for token storage
+
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+
+
 }

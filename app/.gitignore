@@ -1,1 +1,4 @@
 /build
+
+# Secrets
+**/SpotifySecrets.kt
