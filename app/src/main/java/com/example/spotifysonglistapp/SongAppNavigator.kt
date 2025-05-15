@@ -116,15 +116,16 @@ fun SongAppNavigator(
 
 
 
-    Scaffold(
-        topBar = {
-            SongAppBar(
-                currentScreen = currentScreen,
-                canNavigateBack = currentScreen != SongAppScreen.Welcome,
-                navigateUp = { navController.navigateUp() },
-            )
-        }
-    ) { innerPadding ->
+//    Scaffold(
+//        topBar = {
+//            SongAppBar(
+//                currentScreen = currentScreen,
+//                canNavigateBack = currentScreen != SongAppScreen.Welcome,
+//                navigateUp = { navController.navigateUp() },
+//            )
+//        }
+//    )
+    Scaffold { innerPadding ->
         NavHost(
             navController = navController,
             startDestination = startDestination,

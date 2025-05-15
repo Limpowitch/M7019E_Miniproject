@@ -20,6 +20,8 @@ import androidx.navigation.NavHostController
 import com.example.spotifysonglistapp.models.Song
 import com.example.spotifysonglistapp.viewmodel.SongViewModel
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
@@ -34,14 +36,28 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import coil.compose.AsyncImage
 
+//for the test button
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.example.spotifysonglistapp.auth.TokenManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.spotifysonglistapp.viewmodel.TimeRange
+
+// --------
 
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SongList(navController: NavHostController, songViewModel: SongViewModel) {
 
@@ -63,16 +79,49 @@ fun SongList(navController: NavHostController, songViewModel: SongViewModel) {
         }
     }
 
-    LazyColumn {
-        items(songs) { song ->
-            SongItemCard(
-                navController,
-                song = song,
-                modifier = Modifier,
-                songViewModel = songViewModel
+    val currentRange by songViewModel.timeRange.collectAsState()
+
+    var expanded by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Top Tracks (${currentRange.label})") },
+                actions = {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(Icons.Default.FilterList, contentDescription = "Filter by time range")
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        TimeRange.values().forEach { range ->
+                            DropdownMenuItem(
+                                text = { Text(range.label) },
+                                onClick = {
+                                    songViewModel.setTimeRange(range)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
+                }
             )
         }
+    ) { innerPadding ->
+
+        LazyColumn(modifier = Modifier.padding(innerPadding)) {
+            items(songs) { song ->
+                SongItemCard(
+                    navController,
+                    song = song,
+                    modifier = Modifier,
+                    songViewModel = songViewModel
+                )
+            }
+        }
     }
+
 
     // testing
 //    val context = LocalContext.current

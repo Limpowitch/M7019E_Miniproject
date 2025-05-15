@@ -27,31 +27,30 @@ class SongViewModel(
     private val _selectedSong = MutableStateFlow<Song?>(null)
     val selectedSong: StateFlow<Song?> = _selectedSong
 
+    private val _timeRange = MutableStateFlow(TimeRange.SHORT_TERM)
+    val timeRange: StateFlow<TimeRange> = _timeRange
+
     init {
-        viewModelScope.launch {
-            try {
-                val songs = repository.getTopTracks()
-                _songList.value = songs
-            } catch (e: Exception) {
-                Log.e("SongViewModel", "Failed to load top songs", e)
-            }
-        }
+        fetchTopTracks()
+    }
+
+    fun setTimeRange(range: TimeRange) {
+        _timeRange.value = range
+        fetchTopTracks()
     }
 
     fun fetchTopTracks() {
         viewModelScope.launch {
             try {
-                val songs = repository.getTopTracks()
-                _songList.value = songs
+                val result = repository.getTopTracks(timeRange.value.apiValue)
+                _songList.value = result
             } catch (e: Exception) {
                 Log.e("SongViewModel", "Failed to load top songs", e)
                 if (e is HttpException && e.code() == 401) {
-                    Log.w("SongViewModel", "401 Unauthorized - token likely expired")
                     tokenManager.clearToken()
                     _shouldRedirectToLogin.value = true
                 }
             }
-
         }
     }
 

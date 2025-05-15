@@ -11,10 +11,10 @@ class SpotifyRepository(
     private val apiService: SpotifyApiService,
     private val tokenProvider: () -> String? // function to provide token on demand
 ) {
-    suspend fun getTopTracks(): List<Song> {
+    suspend fun getTopTracks(timeRange: String): List<Song> {
         val token = tokenProvider() ?: throw IllegalStateException("No access token available")
         try {
-            val response = apiService.getTopTracks("Bearer $token")
+            val response = apiService.getTopTracks("Bearer $token", timeRange = timeRange)
             return response.items.map {
                 Song(
                     id = it.id,
