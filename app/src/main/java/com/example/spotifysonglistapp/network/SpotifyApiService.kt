@@ -1,5 +1,6 @@
 package com.example.spotifysonglistapp.network
 
+import com.example.spotifysonglistapp.models.RecentlyPlayedResponse
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import okhttp3.OkHttpClient
@@ -8,6 +9,8 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Query
 import com.example.spotifysonglistapp.models.TopTracksResponse
+import com.example.spotifysonglistapp.models.RecentlyPlayedSong
+
 
 interface SpotifyApiService {
 
@@ -17,6 +20,14 @@ interface SpotifyApiService {
         @Query("limit") limit: Int = 20,
         @Query("time_range") timeRange: String = "short_term"
     ): TopTracksResponse
+
+    @GET("v1/me/player/recently-played")
+    suspend fun getRecentlyPlayed(
+        @Header("Authorization") authHeader: String,
+        @Query("limit") limit: Int = 50
+    ): RecentlyPlayedResponse
+
+
 
     companion object {
         fun create(tokenProvider: () -> String?): SpotifyApiService {

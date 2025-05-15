@@ -3,4 +3,5 @@
     <string name="song_list">Song list</string>
     <string name="song_information">PLACEHOLDER, SHOULD HAVE SONG NAME</string>
     <string name="back_button">Back\n</string>
+    <string name="recently_played">Recently Played</string>
 </resources>

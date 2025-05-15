@@ -21,6 +21,7 @@ import com.example.spotifysonglistapp.models.Song
 import com.example.spotifysonglistapp.viewmodel.SongViewModel
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -88,6 +89,13 @@ fun SongList(navController: NavHostController, songViewModel: SongViewModel) {
             TopAppBar(
                 title = { Text("Top Tracks (${currentRange.label})") },
                 actions = {
+
+                    IconButton(onClick = {
+                        navController.navigate(SongAppScreen.RecentlyPlayedSongs.name)
+                    }) {
+                        Icon(Icons.Default.AccessTime, contentDescription = "Recently played songs")
+                    }
+
                     IconButton(onClick = { expanded = true }) {
                         Icon(Icons.Default.FilterList, contentDescription = "Filter by time range")
                     }
@@ -123,7 +131,7 @@ fun SongList(navController: NavHostController, songViewModel: SongViewModel) {
     }
 
 
-    // testing
+     //testing
 //    val context = LocalContext.current
 //    val tokenManager = remember { TokenManager(context) }
 //
@@ -133,7 +141,7 @@ fun SongList(navController: NavHostController, songViewModel: SongViewModel) {
 //    }) {
 //        Text("Simulate Expired Token")
 //    }
-    // testing
+     //testing
 
 }
 

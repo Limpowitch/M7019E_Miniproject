@@ -32,15 +32,18 @@ import com.example.spotifysonglistapp.ui.SongList
 import com.example.spotifysonglistapp.ui.Welcome
 import com.example.spotifysonglistapp.viewmodel.SongViewModel
 import com.example.spotifysonglistapp.auth.TokenManager
+import com.example.spotifysonglistapp.models.RecentlyPlayedSong
 import com.example.spotifysonglistapp.network.SpotifyApiService
 import com.example.spotifysonglistapp.repository.SpotifyRepository
+import com.example.spotifysonglistapp.ui.RecentlyPlayedScreen
 import com.example.spotifysonglistapp.viewmodel.SongViewModelFactory
 
 
 enum class SongAppScreen(@StringRes val title: Int) {
     Welcome(title = R.string.app_name),
     SongList(title = R.string.song_list),
-    SongInformation(title = R.string.song_information) // Placeholder, should display actual song name
+    SongInformation(title = R.string.song_information), // Placeholder, should display actual song name
+    RecentlyPlayedSongs(title = R.string.recently_played)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -114,17 +117,6 @@ fun SongAppNavigator(
         factory = SongViewModelFactory(context)
     )
 
-
-
-//    Scaffold(
-//        topBar = {
-//            SongAppBar(
-//                currentScreen = currentScreen,
-//                canNavigateBack = currentScreen != SongAppScreen.Welcome,
-//                navigateUp = { navController.navigateUp() },
-//            )
-//        }
-//    )
     Scaffold { innerPadding ->
         NavHost(
             navController = navController,
@@ -141,6 +133,10 @@ fun SongAppNavigator(
 
             composable(route = SongAppScreen.SongInformation.name) {
                 SongInformation(navController, songViewModel)
+            }
+
+            composable(route = SongAppScreen.RecentlyPlayedSongs.name) {
+                RecentlyPlayedScreen(navController, repository)
             }
         }
     }
