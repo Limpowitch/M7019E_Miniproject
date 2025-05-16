@@ -8,7 +8,9 @@ data class Track(
     val id: String,
     val name: String,
     val album: Album,
-    val artists: List<Artist>
+    val artists: List<Artist>,
+    val preview_url: String?,
+    val external_urls: Map<String, String>
 )
 
 data class Album(

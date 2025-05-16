@@ -29,7 +29,13 @@ import com.example.spotifysonglistapp.viewmodel.RecentlyPlayedViewModelFactory
 import com.example.spotifysonglistapp.models.Song
 import androidx.compose.runtime.getValue
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import com.example.spotifysonglistapp.SongAppScreen
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,7 +55,14 @@ fun RecentlyPlayedScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Recently Played") })
+            TopAppBar(title = { Text("Recently Played") },
+                actions = {
+                    IconButton(onClick = {
+                        navController.navigate(SongAppScreen.SongList.name)
+                    }) {
+                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Recently played songs")
+                    }
+                })
         }
     ) { innerPadding ->
         LazyColumn(modifier = Modifier.padding(innerPadding)) {

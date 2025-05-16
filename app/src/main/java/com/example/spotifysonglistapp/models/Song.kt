@@ -4,5 +4,7 @@ data class Song(
     val id: String,
     val title: String,
     val artist: String,
-    val albumArtUrl: String
+    val albumArtUrl: String,
+    val previewUrl: String? = null,
+    val spotifyUrl: String
 )

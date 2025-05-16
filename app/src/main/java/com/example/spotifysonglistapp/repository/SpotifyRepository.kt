@@ -17,11 +17,14 @@ class SpotifyRepository(
         try {
             val response = apiService.getTopTracks("Bearer $token", timeRange = timeRange)
             return response.items.map {
+                Log.d("PreviewCheck", "Track: ${it.name}, preview_url: ${it.preview_url}")
                 Song(
                     id = it.id,
                     title = it.name,
                     artist = it.artists.joinToString(", ") { artist -> artist.name },
-                    albumArtUrl = it.album.images.firstOrNull()?.url ?: ""
+                    albumArtUrl = it.album.images.firstOrNull()?.url ?: "",
+                    previewUrl = it.preview_url,
+                    spotifyUrl = it.external_urls["spotify"] ?: ""
                 )
             }
         } catch (e: retrofit2.HttpException) {
