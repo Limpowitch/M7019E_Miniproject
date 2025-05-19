@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import com.example.spotifysonglistapp.auth.TokenManager
+import com.example.spotifysonglistapp.models.RecentlyPlayedSong
 
 class SongViewModel(
     private val repository: SpotifyRepository,
@@ -30,8 +31,17 @@ class SongViewModel(
     private val _timeRange = MutableStateFlow(TimeRange.SHORT_TERM)
     val timeRange: StateFlow<TimeRange> = _timeRange
 
+    private val _selectedRecentSong = MutableStateFlow<RecentlyPlayedSong?>(null)
+    val selectedRecentSong: StateFlow<RecentlyPlayedSong?> = _selectedRecentSong
+
+
+
     init {
         fetchTopTracks()
+    }
+
+    fun selectRecentlyPlayedSong(song: RecentlyPlayedSong) {
+        _selectedRecentSong.value = song
     }
 
     fun setTimeRange(range: TimeRange) {

@@ -1,5 +1,6 @@
 package com.example.spotifysonglistapp.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,7 +36,10 @@ import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.platform.LocalContext
 import com.example.spotifysonglistapp.SongAppScreen
+import com.example.spotifysonglistapp.viewmodel.SongViewModel
+import com.example.spotifysonglistapp.viewmodel.SongViewModelFactory
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -48,6 +52,8 @@ fun RecentlyPlayedScreen(
         factory = RecentlyPlayedViewModelFactory(repository)
     )
     val songs by viewModel.songs.collectAsState()
+    val songViewModel: SongViewModel = viewModel(factory = SongViewModelFactory(LocalContext.current))
+
 
     LaunchedEffect(Unit) {
         viewModel.fetchRecentlyPlayed()
@@ -71,6 +77,10 @@ fun RecentlyPlayedScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(8.dp)
+                        .clickable {
+                            songViewModel.selectRecentlyPlayedSong(song)
+                            navController.navigate(SongAppScreen.SongInformation.name)
+                        }
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
