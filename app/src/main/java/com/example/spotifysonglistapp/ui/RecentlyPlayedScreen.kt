@@ -41,8 +41,12 @@ import com.example.spotifysonglistapp.SongAppScreen
 import com.example.spotifysonglistapp.viewmodel.SongViewModel
 import com.example.spotifysonglistapp.viewmodel.SongViewModelFactory
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.material3.Divider
 import com.example.spotifysonglistapp.models.RecentlyPlayedSong
 
 
@@ -57,50 +61,141 @@ fun RecentlyPlayedScreen(
         factory = RecentlyPlayedViewModelFactory(repository)
     )
     val songs by viewModel.songs.collectAsState()
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     LaunchedEffect(Unit) {
         viewModel.fetchRecentlyPlayed()
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Recently Played") },
-                actions = {
-                    IconButton(onClick = {
-                        navController.navigate(SongAppScreen.SongList.name)
-                    }) {
-                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Recently played songs")
-                    }
-                })
-        }
-    ) { innerPadding ->
-        LazyColumn(modifier = Modifier.padding(innerPadding)) {
-            items(songs) { song ->
-                Card(
+    if (isLandscape) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            // Sidebar
+            Column(
+                modifier = Modifier
+                    .width(200.dp)
+                    .padding(top = 32.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp)
-                        .clickable {
-                            songViewModel.selectSong(song.toSong())
-                            navController.navigate(SongAppScreen.SongInformation.name)
-                        }
+                        .padding(horizontal = 16.dp)
+                        .clickable { navController.navigate(SongAppScreen.SongList.name) } // ✅ Make clickable
                 ) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(8.dp)
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        AsyncImage(
-                            model = song.albumArtUrl,
-                            contentDescription = "Album Art",
-                            modifier = Modifier.size(64.dp),
-                            placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
-                            error = painterResource(id = android.R.drawable.ic_menu_report_image),
-                            contentScale = ContentScale.Crop
+                        Icon(
+                            imageVector = Icons.Default.AccessTime,
+                            contentDescription = "Top Tracks",
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.size(26.dp)
                         )
-                        Column(modifier = Modifier.padding(start = 16.dp)) {
-                            Text(song.title, fontWeight = FontWeight.Bold)
-                            Text(song.artists)
-                            Text("Played at: ${song.playedAt.take(19).replace("T", " ")}", style = MaterialTheme.typography.labelSmall)
+                        Text(
+                            text = "Top Tracks",
+                            modifier = Modifier.padding(start = 8.dp),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+                Divider(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp, start = 24.dp, end = 24.dp),
+                    thickness = 1.dp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
+                )
+
+            }
+
+
+
+
+            // Song list
+            LazyColumn(modifier = Modifier.weight(1f).padding(8.dp)) {
+                items(songs) { song ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable {
+                                songViewModel.selectSong(song.toSong())
+                                navController.navigate(SongAppScreen.SongInformation.name)
+                            }
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            AsyncImage(
+                                model = song.albumArtUrl,
+                                contentDescription = "Album Art",
+                                modifier = Modifier.size(64.dp),
+                                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
+                                error = painterResource(id = android.R.drawable.ic_menu_report_image),
+                                contentScale = ContentScale.Crop
+                            )
+                            Column(modifier = Modifier.padding(start = 16.dp)) {
+                                Text(song.title, fontWeight = FontWeight.Bold)
+                                Text(song.artists)
+                                Text(
+                                    "Played at: ${song.playedAt.take(19).replace("T", " ")}",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    } else {
+        // Portrait fallback — your original layout
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Recently Played") },
+                    actions = {
+                        IconButton(onClick = {
+                            navController.navigate(SongAppScreen.SongList.name)
+                        }) {
+                            Icon(Icons.Default.ArrowBackIosNew, contentDescription = "Go back")
+                        }
+                    }
+                )
+            }
+        ) { innerPadding ->
+            LazyColumn(modifier = Modifier.padding(innerPadding)) {
+                items(songs) { song ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp)
+                            .clickable {
+                                songViewModel.selectSong(song.toSong())
+                                navController.navigate(SongAppScreen.SongInformation.name)
+                            }
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(8.dp)
+                        ) {
+                            AsyncImage(
+                                model = song.albumArtUrl,
+                                contentDescription = "Album Art",
+                                modifier = Modifier.size(64.dp),
+                                placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
+                                error = painterResource(id = android.R.drawable.ic_menu_report_image),
+                                contentScale = ContentScale.Crop
+                            )
+                            Column(modifier = Modifier.padding(start = 16.dp)) {
+                                Text(song.title, fontWeight = FontWeight.Bold)
+                                Text(song.artists)
+                                Text(
+                                    "Played at: ${song.playedAt.take(19).replace("T", " ")}",
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
                         }
                     }
                 }
@@ -108,6 +203,7 @@ fun RecentlyPlayedScreen(
         }
     }
 }
+
 
 fun RecentlyPlayedSong.toSong(): Song = Song(
     id = id,
