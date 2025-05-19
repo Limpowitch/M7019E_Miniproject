@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccessTime
+import androidx.compose.material.icons.filled.BugReport
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -86,7 +87,6 @@ fun SongList(navController: NavHostController, songViewModel: SongViewModel) {
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.2f)
                 )
-                Spacer(modifier = Modifier.height(16.dp))
 
                 TimeRange.values().forEach { range ->
                     Button(
@@ -99,6 +99,39 @@ fun SongList(navController: NavHostController, songViewModel: SongViewModel) {
                         Text(text = range.label)
                     }
                 }
+
+                val context = LocalContext.current
+                val tokenManager = remember { TokenManager(context) }
+
+                Spacer(modifier = Modifier.height(32.dp))
+
+                IconButton(
+                    onClick = {
+                        tokenManager.saveToken("invalid_or_expired_token")
+                        Log.d("DebugButton", "Fake expired token set.")
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp, horizontal = 24.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.BugReport,
+                            contentDescription = "Simulate Token Expiry",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = "Expire Token",
+                            modifier = Modifier.padding(start = 12.dp),
+                            color = MaterialTheme.colorScheme.onSurface,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+
             }
 
             LazyColumn(
