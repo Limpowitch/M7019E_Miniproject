@@ -40,20 +40,23 @@ import androidx.compose.ui.platform.LocalContext
 import com.example.spotifysonglistapp.SongAppScreen
 import com.example.spotifysonglistapp.viewmodel.SongViewModel
 import com.example.spotifysonglistapp.viewmodel.SongViewModelFactory
+import android.content.res.Configuration
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.foundation.layout.widthIn
+import com.example.spotifysonglistapp.models.RecentlyPlayedSong
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RecentlyPlayedScreen(
     navController: NavHostController,
-    repository: SpotifyRepository
+    repository: SpotifyRepository,
+    songViewModel: SongViewModel
 ) {
     val viewModel: RecentlyPlayedViewModel = viewModel(
         factory = RecentlyPlayedViewModelFactory(repository)
     )
     val songs by viewModel.songs.collectAsState()
-    val songViewModel: SongViewModel = viewModel(factory = SongViewModelFactory(LocalContext.current))
-
 
     LaunchedEffect(Unit) {
         viewModel.fetchRecentlyPlayed()
@@ -78,7 +81,7 @@ fun RecentlyPlayedScreen(
                         .fillMaxWidth()
                         .padding(8.dp)
                         .clickable {
-                            songViewModel.selectRecentlyPlayedSong(song)
+                            songViewModel.selectSong(song.toSong())
                             navController.navigate(SongAppScreen.SongInformation.name)
                         }
                 ) {
@@ -105,3 +108,12 @@ fun RecentlyPlayedScreen(
         }
     }
 }
+
+fun RecentlyPlayedSong.toSong(): Song = Song(
+    id = id,
+    title = title,
+    artist = artists,
+    albumArtUrl = albumArtUrl,
+    previewUrl = null,
+    spotifyUrl = spotifyUrl
+)

@@ -31,18 +31,12 @@ class SongViewModel(
     private val _timeRange = MutableStateFlow(TimeRange.SHORT_TERM)
     val timeRange: StateFlow<TimeRange> = _timeRange
 
-    private val _selectedRecentSong = MutableStateFlow<RecentlyPlayedSong?>(null)
-    val selectedRecentSong: StateFlow<RecentlyPlayedSong?> = _selectedRecentSong
-
-
 
     init {
         fetchTopTracks()
     }
 
-    fun selectRecentlyPlayedSong(song: RecentlyPlayedSong) {
-        _selectedRecentSong.value = song
-    }
+
 
     fun setTimeRange(range: TimeRange) {
         _timeRange.value = range
@@ -67,4 +61,5 @@ class SongViewModel(
     fun selectSong(song: Song) {
         _selectedSong.value = song
     }
+
 }

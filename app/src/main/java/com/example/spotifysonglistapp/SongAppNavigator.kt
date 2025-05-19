@@ -136,7 +136,7 @@ fun SongAppNavigator(
             }
 
             composable(route = SongAppScreen.RecentlyPlayedSongs.name) {
-                RecentlyPlayedScreen(navController, repository)
+                RecentlyPlayedScreen(navController, repository, songViewModel)
             }
         }
     }

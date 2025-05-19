@@ -47,7 +47,8 @@ class SpotifyRepository(
                 title = it.track.name,
                 artists = it.track.artists.joinToString(", ") { artist -> artist.name },
                 albumArtUrl = it.track.album.images.firstOrNull()?.url ?: "",
-                playedAt = it.played_at
+                playedAt = it.played_at,
+                spotifyUrl = it.track.external_urls["spotify"] ?: ""
             )
         }
     }
