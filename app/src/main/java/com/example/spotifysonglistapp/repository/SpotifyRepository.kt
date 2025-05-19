@@ -5,6 +5,7 @@ import android.content.Context
 import android.util.Log
 import com.example.spotifysonglistapp.auth.TokenManager
 import com.example.spotifysonglistapp.models.ArtistResponse
+import com.example.spotifysonglistapp.models.ArtistTopTracksResponse
 import com.example.spotifysonglistapp.models.RecentlyPlayedSong
 import com.example.spotifysonglistapp.models.Song
 import com.example.spotifysonglistapp.models.Track
@@ -70,11 +71,13 @@ class SpotifyRepository(
     }
 
     suspend fun getArtistTopTracks(artistId: String): List<Track> {
-        val token = tokenProvider()
-            ?: throw IllegalStateException("No access token available")
-
-        // This endpoint DOES want your Bearer token:
-        val response = apiService.getArtistTopTracks("Bearer $token", artistId)
-        return response.items
+        return try {
+            // Använder den nya ArtistTopTracksResponse-klassen
+            val response: ArtistTopTracksResponse = apiService.getArtistTopTracks(artistId)
+            response.tracks
+        } catch (e: HttpException) {
+            Log.e("SpotifyRepository", "Failed to fetch top tracks for $artistId", e)
+            throw e
+        }
     }
 }

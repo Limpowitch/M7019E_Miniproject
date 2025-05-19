@@ -1,6 +1,7 @@
 // app/src/main/java/com/example/spotifysonglistapp/viewmodel/SongViewModel.kt
 package com.example.spotifysonglistapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.spotifysonglistapp.models.ArtistResponse
@@ -91,14 +92,22 @@ class SongViewModel(
     fun fetchArtistData(artistId: String) {
         viewModelScope.launch {
             try {
+                // 1) Hämta och spara grundinfo om artisten
                 val info = repository.getArtistInfo(artistId)
                 _artist.value = info
 
+                // 2) Hämta och spara deras topplåtar
                 val top = repository.getArtistTopTracks(artistId)
                 _artistTopTracks.value = top
-            } catch (_: Exception) {
-                // ignore
+
+                Log.d("SongViewModel", "Artist info: $info")
+                Log.d("SongViewModel", "Top tracks: $top")
+            } catch (e: Exception) {
+                Log.e("SongViewModel", "Error loading artist data", e)
             }
         }
     }
 }
+
+
+

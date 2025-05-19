@@ -131,8 +131,7 @@ fun SongAppNavigator(
                 SongListScreen(navController = navController, songViewModel = songViewModel)
             }
 
-            composable(SongAppScreen.SongInformation.name) {
-                // <-- THIS MUST MATCH the navigate(...) call
+            composable(route = SongAppScreen.SongInformation.name) {
                 SongInformationScreen(navController, songViewModel)
             }
 

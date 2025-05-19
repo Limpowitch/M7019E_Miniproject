@@ -1,14 +1,18 @@
-// app/src/main/java/com/example/spotifysonglistapp/ui/SongInformationScreen.kt
+// src/main/java/com/example/spotifysonglistapp/ui/SongInformationScreen.kt
 package com.example.spotifysonglistapp.ui
-
+import com.example.spotifysonglistapp.ui.SongInformationScreen
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -36,13 +40,11 @@ fun SongInformationScreen(
     navController: NavHostController,
     songViewModel: SongViewModel
 ) {
-    // Collect state from ViewModel
     val song by songViewModel.selectedSong.collectAsState()
     val artistInfo by songViewModel.artist.collectAsState()
     val topTracks by songViewModel.artistTopTracks.collectAsState()
 
     song?.let { currentSong ->
-        // Trigger fetching of artist data when the song changes
         LaunchedEffect(currentSong.artistId) {
             songViewModel.fetchArtistData(currentSong.artistId)
         }
@@ -65,14 +67,33 @@ fun SongInformationScreen(
                     .padding(innerPadding)
                     .padding(16.dp),
                 portrait = {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize()
+                            .padding(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally   // ← center children
+                    ) {
+                        item { AlbumArt(currentSong.albumArtUrl, size = 250.dp) }
+                        item { SongDetails(currentSong) }
+                        item { PreviewOrButton(currentSong) }
+                        artistInfo?.let { info ->
+                            item {
+                                Spacer(Modifier.height(24.dp))
+                                ArtistSection(info, topTracks)
+                            }
+                        }
+                    }
+                },
+                landscape = {
                     Column(
                         modifier = Modifier
                             .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
                             .padding(8.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        AlbumArt(currentSong.albumArtUrl, size = 250.dp)
+                        AlbumArt(currentSong.albumArtUrl, size = 200.dp)
                         SongDetails(currentSong)
                         PreviewOrButton(currentSong)
                         artistInfo?.let { info ->
@@ -80,40 +101,11 @@ fun SongInformationScreen(
                             ArtistSection(info, topTracks)
                         }
                     }
-                },
-                landscape = {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(8.dp),
-                        verticalAlignment = Alignment.Top,
-                        horizontalArrangement = Arrangement.spacedBy(24.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            AlbumArt(currentSong.albumArtUrl, size = 200.dp)
-                            SongDetails(currentSong)
-                            PreviewOrButton(currentSong)
-                        }
-                        Column(
-                            modifier = Modifier.weight(1f),
-                            verticalArrangement = Arrangement.spacedBy(16.dp)
-                        ) {
-                            artistInfo?.let { info ->
-                                ArtistSection(info, topTracks)
-                            }
-                        }
-                    }
                 }
             )
         }
     }
 }
-
-// ---------- Helper composables ----------
 
 @Composable
 private fun AlbumArt(url: String, size: Dp) {
@@ -158,6 +150,7 @@ private fun ArtistSection(
 ) {
     Text("Artist: ${artist.name}", style = MaterialTheme.typography.titleMedium)
     Text("Followers: ${artist.followers.total}", style = MaterialTheme.typography.bodyMedium)
+    Log.d("Followers", "Followers: ${artist.followers.total}")
     Spacer(Modifier.height(8.dp))
     Text("Top Tracks", style = MaterialTheme.typography.titleMedium)
     LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
