@@ -18,7 +18,8 @@ data class Album(
 )
 
 data class Artist(
-    val name: String
+    val name: String,
+    val id: String
 )
 
 data class Image(

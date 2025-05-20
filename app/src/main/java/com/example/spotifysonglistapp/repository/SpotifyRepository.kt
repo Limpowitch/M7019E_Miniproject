@@ -3,9 +3,13 @@ package com.example.spotifysonglistapp.repository
 import android.content.Context
 import android.util.Log
 import com.example.spotifysonglistapp.auth.TokenManager
+import com.example.spotifysonglistapp.models.ArtistResponse
+import com.example.spotifysonglistapp.models.ArtistTopTracksResponse
 import com.example.spotifysonglistapp.models.RecentlyPlayedSong
 import com.example.spotifysonglistapp.models.Song
+import com.example.spotifysonglistapp.models.Track
 import com.example.spotifysonglistapp.network.SpotifyApiService
+import retrofit2.HttpException
 
 class SpotifyRepository(
     private val context: Context,
@@ -24,7 +28,8 @@ class SpotifyRepository(
                     artist = it.artists.joinToString(", ") { artist -> artist.name },
                     albumArtUrl = it.album.images.firstOrNull()?.url ?: "",
                     previewUrl = it.preview_url,
-                    spotifyUrl = it.external_urls["spotify"] ?: ""
+                    spotifyUrl = it.external_urls["spotify"] ?: "",
+                    artistId = it.artists.firstOrNull()?.id ?: ""
                 )
             }
         } catch (e: retrofit2.HttpException) {
@@ -50,6 +55,22 @@ class SpotifyRepository(
                 playedAt = it.played_at,
                 spotifyUrl = it.track.external_urls["spotify"] ?: ""
             )
+        }
+    }
+
+    suspend fun getArtistInfo(artistId: String): ArtistResponse {
+        // Note: SpotifyApiService.getArtist only wants the ID, not the token header
+        return apiService.getArtist(artistId)
+    }
+
+    suspend fun getArtistTopTracks(artistId: String): List<Track> {
+        return try {
+            val token = tokenProvider() ?: throw IllegalStateException("No access token available")
+            val response = apiService.getArtistTopTracks("Bearer $token", artistId, "SE")
+            response.tracks
+        } catch (e: HttpException) {
+            Log.e("SpotifyRepository", "Failed to fetch top tracks for $artistId", e)
+            throw e
         }
     }
 

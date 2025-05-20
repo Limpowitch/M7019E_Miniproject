@@ -1,5 +1,7 @@
 package com.example.spotifysonglistapp.network
 
+import com.example.spotifysonglistapp.models.ArtistResponse
+import com.example.spotifysonglistapp.models.ArtistTopTracksResponse
 import com.example.spotifysonglistapp.models.RecentlyPlayedResponse
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -10,6 +12,7 @@ import retrofit2.http.Header
 import retrofit2.http.Query
 import com.example.spotifysonglistapp.models.TopTracksResponse
 import com.example.spotifysonglistapp.models.RecentlyPlayedSong
+import retrofit2.http.Path
 
 
 interface SpotifyApiService {
@@ -27,7 +30,17 @@ interface SpotifyApiService {
         @Query("limit") limit: Int = 50
     ): RecentlyPlayedResponse
 
+    @GET("v1/artists/{id}")
+    suspend fun getArtist(
+        @Path("id") artistId: String
+    ): ArtistResponse
 
+    @GET("v1/artists/{id}/top-tracks")
+    suspend fun getArtistTopTracks(
+        @Header("Authorization") authHeader: String,
+        @Path("id") artistId: String,
+        @Query("market") market: String
+    ): ArtistTopTracksResponse
 
     companion object {
         fun create(tokenProvider: () -> String?): SpotifyApiService {

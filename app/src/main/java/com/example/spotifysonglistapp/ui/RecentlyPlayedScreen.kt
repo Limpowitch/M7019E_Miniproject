@@ -211,5 +211,6 @@ fun RecentlyPlayedSong.toSong(): Song = Song(
     artist = artists,
     albumArtUrl = albumArtUrl,
     previewUrl = null,
-    spotifyUrl = spotifyUrl
+    spotifyUrl = spotifyUrl,
+    artistId = ""
 )

@@ -27,7 +27,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.spotifysonglistapp.ui.SongInformation
 import com.example.spotifysonglistapp.ui.SongList
 import com.example.spotifysonglistapp.ui.Welcome
 import com.example.spotifysonglistapp.viewmodel.SongViewModel
@@ -36,6 +35,7 @@ import com.example.spotifysonglistapp.models.RecentlyPlayedSong
 import com.example.spotifysonglistapp.network.SpotifyApiService
 import com.example.spotifysonglistapp.repository.SpotifyRepository
 import com.example.spotifysonglistapp.ui.RecentlyPlayedScreen
+import com.example.spotifysonglistapp.ui.SongInformationScreen
 import com.example.spotifysonglistapp.viewmodel.SongViewModelFactory
 
 
@@ -132,7 +132,7 @@ fun SongAppNavigator(
             }
 
             composable(route = SongAppScreen.SongInformation.name) {
-                SongInformation(navController, songViewModel)
+                SongInformationScreen(navController, songViewModel)
             }
 
             composable(route = SongAppScreen.RecentlyPlayedSongs.name) {

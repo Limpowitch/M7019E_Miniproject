@@ -12,7 +12,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import com.example.spotifysonglistapp.auth.TokenManager
+import com.example.spotifysonglistapp.models.ArtistResponse
 import com.example.spotifysonglistapp.models.RecentlyPlayedSong
+import com.example.spotifysonglistapp.models.Track
 
 class SongViewModel(
     private val repository: SpotifyRepository,
@@ -31,6 +33,11 @@ class SongViewModel(
     private val _timeRange = MutableStateFlow(TimeRange.SHORT_TERM)
     val timeRange: StateFlow<TimeRange> = _timeRange
 
+    private val _artist = MutableStateFlow<ArtistResponse?>(null)
+    val artist: StateFlow<ArtistResponse?> = _artist
+
+    private val _artistTopTracks = MutableStateFlow<List<Track>>(emptyList())
+    val artistTopTracks: StateFlow<List<Track>> = _artistTopTracks
 
     init {
         fetchTopTracks()
@@ -60,6 +67,25 @@ class SongViewModel(
 
     fun selectSong(song: Song) {
         _selectedSong.value = song
+    }
+
+    fun fetchArtistData(artistId: String) {
+        viewModelScope.launch {
+            try {
+                // 1) Hämta och spara grundinfo om artisten
+                val info = repository.getArtistInfo(artistId)
+                _artist.value = info
+
+                // 2) Hämta och spara deras topplåtar
+                val top = repository.getArtistTopTracks(artistId)
+                _artistTopTracks.value = top
+
+                Log.d("ArtistData", "Artist info: $info")
+                Log.d("ArtistData", "Top tracks: $top")
+            } catch (e: Exception) {
+                Log.e("ArtistData", "Error loading artist data", e)
+            }
+        }
     }
 
 }

@@ -1,100 +1,259 @@
+// src/main/java/com/example/spotifysonglistapp/ui/SongInformationScreen.kt
 package com.example.spotifysonglistapp.ui
-
+import com.example.spotifysonglistapp.ui.SongInformationScreen
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.navigation.NavHostController
-import com.example.spotifysonglistapp.viewmodel.SongViewModel
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
+import com.example.spotifysonglistapp.models.ArtistResponse
+import com.example.spotifysonglistapp.models.Song
+import com.example.spotifysonglistapp.models.Track
+import com.example.spotifysonglistapp.ui.util.Responsive
+import com.example.spotifysonglistapp.viewmodel.SongViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SongInformation(navController: NavHostController, songViewModel: SongViewModel) {
+fun SongInformationScreen(
+    navController: NavHostController,
+    songViewModel: SongViewModel
+) {
     val song by songViewModel.selectedSong.collectAsState()
-    val context = LocalContext.current
+    val artistInfo by songViewModel.artist.collectAsState()
+    val topTracks by songViewModel.artistTopTracks.collectAsState()
 
-    song?.let {
+    song?.let { currentSong ->
+        LaunchedEffect(currentSong.artistId) {
+            Log.d("ArtistID", "artist id is ${currentSong.artistId}")
+            songViewModel.fetchArtistData(currentSong.artistId)
+        }
+
         Scaffold(
             topBar = {
-                TopAppBar(
-                    title = { Text(it.title) },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.navigateUp() }) {
-                            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                if (isPortrait()) {
+                    TopAppBar(
+                        title = { Text("") },
+                        navigationIcon = {
+                            IconButton(onClick = { navController.navigateUp() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
                         }
-                    }
-                )
+                    )
+                }
             }
         ) { innerPadding ->
-            Column(
+            Responsive(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .padding(16.dp),
+                    .padding(innerPadding),
+
+                portrait = {
+                    LazyColumn(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        item { AlbumArt(currentSong.albumArtUrl, size = 200.dp) }
+                        item { SongDetails(currentSong) }
+                        item { PreviewOrButton(currentSong) }
+
+                        artistInfo?.let { info ->
+                            item {
+                                Text("Followers: ${info.followers.total}", style = MaterialTheme.typography.bodyMedium)
+                            }
+                            item {
+                                Spacer(Modifier.height(8.dp))
+                                Text("Top Tracks", style = MaterialTheme.typography.titleMedium)
+                            }
+                            item {
+                                LazyRow(
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    items(topTracks) { trackItem ->
+                                        TrackCard(trackItem)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+
+                landscape = {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .width(56.dp)
+                                .fillMaxHeight(),
+                            verticalArrangement = Arrangement.Top,
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            IconButton(onClick = { navController.navigateUp() }) {
+                                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                            }
+                        }
+
+                        Divider(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .width(1.dp),
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.1f)
+                        )
+
+                        Row(
+                            modifier = Modifier
+                                .weight(1f)
+                                .fillMaxHeight(),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            Column(
+                                modifier = Modifier.weight(1f),
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                verticalArrangement = Arrangement.spacedBy(16.dp)
+                            ) {
+                                AlbumArt(currentSong.albumArtUrl, size = 160.dp)
+                                SongDetails(currentSong)
+                                PreviewOrButton(currentSong)
+                            }
+
+                            Column(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .fillMaxHeight()
+                                    .verticalScroll(rememberScrollState()),
+                                verticalArrangement = Arrangement.spacedBy(16.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                artistInfo?.let { info ->
+                                    Spacer(Modifier.height(20.dp))
+                                    Text("Followers: ${info.followers.total}", style = MaterialTheme.typography.bodyMedium)
+                                    Text("Top Tracks", style = MaterialTheme.typography.titleMedium)
+                                    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                        items(topTracks) { trackItem ->
+                                            TrackCard(trackItem)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            )
+        }
+    }
+}
+
+@Composable
+private fun isPortrait(): Boolean {
+    val configuration = androidx.compose.ui.platform.LocalConfiguration.current
+    return configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+}
+
+
+@Composable
+private fun AlbumArt(url: String, size: Dp) {
+    AsyncImage(
+        model = url,
+        contentDescription = "Album Art",
+        placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
+        error = painterResource(id = android.R.drawable.ic_menu_report_image),
+        contentScale = ContentScale.Crop,
+        modifier = Modifier
+            .size(size)
+            .clip(RoundedCornerShape(8.dp))
+    )
+}
+
+@Composable
+private fun SongDetails(song: Song) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(song.title, style = MaterialTheme.typography.headlineSmall)
+        Text(song.artist, style = MaterialTheme.typography.titleMedium)
+    }
+}
+
+@Composable
+private fun PreviewOrButton(song: Song) {
+    val context = LocalContext.current
+    if (song.previewUrl != null) {
+        AudioPlayer(previewUrl = song.previewUrl)
+    } else {
+        Button(onClick = {
+            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(song.spotifyUrl)))
+        }) {
+            Text("Play on Spotify")
+        }
+        //Spacer(Modifier.height(8.dp))
+        //Text("Preview not available.")
+    }
+}
+
+@Composable
+private fun ArtistSection(
+    artist: ArtistResponse,
+    topTracks: List<Track>
+) {
+    //Text("Artist: ${artist.name}", style = MaterialTheme.typography.titleMedium)
+    Text("Followers: ${artist.followers.total}", style = MaterialTheme.typography.bodyMedium)
+    Log.d("Followers", "Followers: ${artist.followers.total}")
+    Spacer(Modifier.height(8.dp))
+    Text("Top Tracks", style = MaterialTheme.typography.titleMedium)
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        items(topTracks) { trackItem ->
+            Column(
+                modifier = Modifier
+                    .width(120.dp)
+                    .clickable { /* navigate if needed */ },
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 AsyncImage(
-                    model = it.albumArtUrl,
-                    contentDescription = "Album Art",
-                    modifier = Modifier
-                        .size(250.dp)
-                        .padding(16.dp),
+                    model = trackItem.album.images.firstOrNull()?.url,
+                    contentDescription = trackItem.name,
                     placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
                     error = painterResource(id = android.R.drawable.ic_menu_report_image),
-                    contentScale = ContentScale.Crop
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(RoundedCornerShape(8.dp))
                 )
-
-                Text(text = it.title, style = MaterialTheme.typography.headlineSmall)
-                Text(text = it.artist, style = MaterialTheme.typography.titleMedium)
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                if (it.previewUrl != null) {
-                    AudioPlayer(previewUrl = it.previewUrl)
-                } else {
-                    song?.let { song ->
-                        Button(onClick = {
-                            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(song.spotifyUrl))
-                            context.startActivity(intent)
-                        }) {
-                            Text("Play on Spotify")
-                        }
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Text("Preview not available.")
-                }
+                Text(
+                    text = trackItem.name,
+                    style = MaterialTheme.typography.bodySmall,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
             }
         }
     }
@@ -102,40 +261,26 @@ fun SongInformation(navController: NavHostController, songViewModel: SongViewMod
 
 @Composable
 fun AudioPlayer(previewUrl: String) {
-    val context = LocalContext.current
     var isPlaying by remember { mutableStateOf(false) }
     var isPrepared by remember { mutableStateOf(false) }
-
     val mediaPlayer = remember(previewUrl) {
         MediaPlayer().apply {
             setDataSource(previewUrl)
-            setOnPreparedListener {
-                isPrepared = true
-            }
+            setOnPreparedListener { isPrepared = true }
             prepareAsync()
         }
     }
-
     DisposableEffect(previewUrl) {
         onDispose {
-            if (mediaPlayer.isPlaying) {
-                mediaPlayer.stop()
-            }
+            if (mediaPlayer.isPlaying) mediaPlayer.stop()
             mediaPlayer.release()
         }
     }
-
     Button(
-        onClick = onClick@{
-            if (!isPrepared) return@onClick
-
-            if (mediaPlayer.isPlaying) {
-                mediaPlayer.pause()
-                isPlaying = false
-            } else {
-                mediaPlayer.start()
-                isPlaying = true
-            }
+        onClick = {
+            if (!isPrepared) return@Button
+            if (mediaPlayer.isPlaying) mediaPlayer.pause() else mediaPlayer.start()
+            isPlaying = mediaPlayer.isPlaying
         },
         enabled = isPrepared
     ) {
@@ -143,4 +288,29 @@ fun AudioPlayer(previewUrl: String) {
     }
 }
 
-
+@Composable
+private fun TrackCard(trackItem: Track) {
+    Column(
+        modifier = Modifier
+            .width(120.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        AsyncImage(
+            model = trackItem.album.images.firstOrNull()?.url,
+            contentDescription = trackItem.name,
+            placeholder = painterResource(id = android.R.drawable.ic_menu_gallery),
+            error = painterResource(id = android.R.drawable.ic_menu_report_image),
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(100.dp)
+                .clip(RoundedCornerShape(8.dp))
+        )
+        Text(
+            text = trackItem.name,
+            style = MaterialTheme.typography.bodySmall,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(top = 4.dp)
+        )
+    }
+}
