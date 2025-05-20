@@ -72,11 +72,9 @@ class SongViewModel(
     fun fetchArtistData(artistId: String) {
         viewModelScope.launch {
             try {
-                // 1) Hämta och spara grundinfo om artisten
                 val info = repository.getArtistInfo(artistId)
                 _artist.value = info
 
-                // 2) Hämta och spara deras topplåtar
                 val top = repository.getArtistTopTracks(artistId)
                 _artistTopTracks.value = top
 

@@ -70,7 +70,7 @@ fun RecentlyPlayedScreen(
 
     if (isLandscape) {
         Row(modifier = Modifier.fillMaxSize()) {
-            // Sidebar
+            // Sidebar!!!
             Column(
                 modifier = Modifier
                     .width(200.dp)
@@ -80,7 +80,7 @@ fun RecentlyPlayedScreen(
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 16.dp)
-                        .clickable { navController.navigate(SongAppScreen.SongList.name) } // ✅ Make clickable
+                        .clickable { navController.navigate(SongAppScreen.SongList.name) }
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -112,7 +112,7 @@ fun RecentlyPlayedScreen(
 
 
 
-            // Song list
+            // the song list
             LazyColumn(modifier = Modifier.weight(1f).padding(8.dp)) {
                 items(songs) { song ->
                     Card(
@@ -150,7 +150,7 @@ fun RecentlyPlayedScreen(
             }
         }
     } else {
-        // Portrait fallback — your original layout
+        // portrait fallback!
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -212,5 +212,5 @@ fun RecentlyPlayedSong.toSong(): Song = Song(
     albumArtUrl = albumArtUrl,
     previewUrl = null,
     spotifyUrl = spotifyUrl,
-    artistId = ""
+    artistId = artistId
 )

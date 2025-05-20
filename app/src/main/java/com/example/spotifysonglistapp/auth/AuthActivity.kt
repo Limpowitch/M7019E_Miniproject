@@ -62,7 +62,7 @@ class AuthActivity : Activity() {
                         Log.e("AuthActivity", "Exception during token exchange", e)
                     }
 
-                    finish() // Close AuthActivity regardless of result
+                    finish()
                 }
             } else {
                 Log.e("AuthActivity", "No authorization code found")

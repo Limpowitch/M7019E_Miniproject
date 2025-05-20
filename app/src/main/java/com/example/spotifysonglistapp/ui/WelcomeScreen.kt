@@ -17,7 +17,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.spotifysonglistapp.SongAppScreen
-import com.example.spotifysonglistapp.auth.AuthActivity
 import android.app.Activity
 import android.net.Uri
 import android.util.Log

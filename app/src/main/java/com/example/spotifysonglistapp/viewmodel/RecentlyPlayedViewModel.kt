@@ -25,7 +25,7 @@ class RecentlyPlayedViewModel(
             } catch (e: Exception) {
                 Log.e("RecentlyPlayedViewModel", "Failed to load recently played songs", e)
                 if (e is HttpException && e.code() == 401) {
-                    // Optional: add logic to redirect if token is invalid
+                    // we should add logic to redirect to login here probs....
                 }
             }
         }

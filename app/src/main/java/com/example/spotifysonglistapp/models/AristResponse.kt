@@ -1,7 +1,5 @@
 package com.example.spotifysonglistapp.models
 
-import com.example.spotifysonglistapp.models.Image
-
 data class ArtistResponse(
     val id: String,
     val name: String,

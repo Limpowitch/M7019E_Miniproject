@@ -38,43 +38,11 @@ import com.example.spotifysonglistapp.ui.RecentlyPlayedScreen
 import com.example.spotifysonglistapp.ui.SongInformationScreen
 import com.example.spotifysonglistapp.viewmodel.SongViewModelFactory
 
-
 enum class SongAppScreen(@StringRes val title: Int) {
     Welcome(title = R.string.app_name),
     SongList(title = R.string.song_list),
-    SongInformation(title = R.string.song_information), // Placeholder, should display actual song name
+    SongInformation(title = R.string.song_information),
     RecentlyPlayedSongs(title = R.string.recently_played)
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun SongAppBar(
-    currentScreen: SongAppScreen,
-    canNavigateBack: Boolean,
-    navigateUp: () -> Unit = {},
-    modifier: Modifier = Modifier,
-    customTitle: String? = null
-) {
-    TopAppBar(
-        title = { Text(text = customTitle ?: stringResource(id = currentScreen.title)) }, // We currently dont have custom titles
-        modifier = modifier,
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primary,
-            titleContentColor = MaterialTheme.colorScheme.onPrimary
-        ),
-        navigationIcon = {
-            if (canNavigateBack) {
-                IconButton(onClick = navigateUp) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack,
-                        contentDescription = stringResource(id = R.string.back_button),
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
-                }
-            }
-        }
-    )
-
 }
 
 @Composable
@@ -92,12 +60,6 @@ fun SongAppNavigator(
     val tokenManager = TokenManager(context)
     val apiService = SpotifyApiService.create { tokenManager.getToken() ?: "" }
     val repository = SpotifyRepository(context, SpotifyApiService.create { tokenManager.getToken() ?: "" }, tokenManager::getToken)
-
-
-
-
-
-    // ✅ Determine start destination based on token
 
     LaunchedEffect(token) {
         if (token != null) {

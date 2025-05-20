@@ -7,6 +7,7 @@ data class RecentlyPlayedSong(
     val albumArtUrl: String,
     val playedAt: String,
     val previewUrl: String? = null,
-    val spotifyUrl: String
+    val spotifyUrl: String,
+    val artistId: String
 )
 

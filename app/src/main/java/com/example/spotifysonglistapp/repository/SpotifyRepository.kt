@@ -35,7 +35,7 @@ class SpotifyRepository(
         } catch (e: retrofit2.HttpException) {
             if (e.code() == 401) {
                 Log.w("SpotifyRepository", "Token expired or invalid. Clearing and redirecting to login.")
-                TokenManager(context).clearToken() // make sure you pass context to repository
+                TokenManager(context).clearToken() // super important to pass context (dependency injection all the way)
                 throw e
             } else {
                 throw e
@@ -53,13 +53,13 @@ class SpotifyRepository(
                 artists = it.track.artists.joinToString(", ") { artist -> artist.name },
                 albumArtUrl = it.track.album.images.firstOrNull()?.url ?: "",
                 playedAt = it.played_at,
-                spotifyUrl = it.track.external_urls["spotify"] ?: ""
+                spotifyUrl = it.track.external_urls["spotify"] ?: "",
+                artistId = it.track.artists.firstOrNull()?.id ?: ""
             )
         }
     }
 
     suspend fun getArtistInfo(artistId: String): ArtistResponse {
-        // Note: SpotifyApiService.getArtist only wants the ID, not the token header
         return apiService.getArtist(artistId)
     }
 
